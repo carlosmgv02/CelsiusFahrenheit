@@ -12,11 +12,6 @@
 
 .include "include/Q14.i"
 
-.data
-		.align 2
-	onePoint8:	.word 0x00007333	@; real 9.0/5.0 en codificacion Q14
-	zeroPoint5: .word 0x0000238E	@; real 5.0/9.0 en codificacion Q14
-	thirty2: 	.word 0x00080000	@; real 32.0 en codificacion Q14
 .text
 		.align 2
 		.arm
@@ -33,14 +28,12 @@
 Celsius2Fahrenheit:
 		push {r1-r6, lr}
 				
-		ldr	r1, =onePoint8			@; R1 points to @onePoint8
-		ldr r1, [r1]				@; load decimal number 1.8 codified in Q14
-									@; format
+		ldr	r1, =0x00007333			@; load number 1.8 codified in Q14 format
 		
 		smull r2, r3, r0, r1		@; R2 = Q14(input) * Q14(1.8)
 		
 @; Displacement of register 2 and 3 to the right.
-		mov r4, #14					@; number of bits to shift 
+		mov r4, #14					@; bits number to shift 
 		rsb r5, r4, #32				@; R2 = 32 - 14 = 18
 		mov r6, r2, lsl r5			@; R6 hold r1 bits that get out when doing
 									@; the lower part displacement
@@ -50,12 +43,9 @@ Celsius2Fahrenheit:
 		orr r2, r3, lsl r5			@; add to Rlo d bits between Rhi and Rlo
 		mov r3, r3, asr r4			@; shift to the right the higher part
 
-		ldr r1, =thirty2			@; R1 points to @thirty2
-		ldr r1, [r1]				@; load number 32.0 codified in Q14 format
-		add r2, r1					@; sum 32.0 to R2
+		ldr r1, =0x00080000			@; load number 32.0 codified in Q14 format
+		add r0, r2, r1				@; sum 32.0 to R2
 		
-		mov r0, r2					@; R0 = output, as R0 must contain the 
-									@; output value
 		pop {r1-r6, pc}
 
 
@@ -71,13 +61,11 @@ Celsius2Fahrenheit:
 Fahrenheit2Celsius:
 		push {r1-r6, lr}
 		
-		ldr r1, =thirty2			@; R1 points to @thirty2
-		ldr r1, [r1]				@; load number 32.0 coded in Q14 format  
+		ldr r1, =0x00080000			@; load number 32.0 coded in Q14 format  
 		
 		sub r0, r1					@; R0 = R0 - R1 = Q14(input) - Q14(32.0)
 		
-		ldr r1, =zeroPoint5			@; R1 points to @zeroPoint5
-		ldr r1, [r1]				@; Assign the value pointed by zeroPoint5
+		ldr r1, =0x0000238E			@; Assign the value 0.5 in R1
 		
 		smull r2, r3, r0, r1		@; R2 = Q14(input - 32.0) * Q14(5/9)
 		

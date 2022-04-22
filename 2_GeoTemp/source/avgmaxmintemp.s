@@ -43,7 +43,7 @@ avgmaxmin_city:
 	mov r11, #0						@; offset to get the temperature
 
 @; Initialize avg, min and max variable with the values at the first column
-	mul r11, r2, r1					@; R12 = i*NC, calculate  offset
+	mul r11, r2, r1					@; R12 = i*NC, calculate row offset
 	ldr r4, [r0, r11, lsl #2]		@; init avg with ttemp[id_city][0]
 	mov r5, r4
 	mov r6, r4						
